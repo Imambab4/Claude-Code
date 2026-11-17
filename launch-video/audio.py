@@ -3,7 +3,7 @@
 import numpy as np, wave, os
 
 SR = 44100
-DUR = 44.0
+DUR = 36.0
 N = int(SR * DUR)
 rs = np.random.RandomState(3)
 BEAT = 0.5
@@ -156,30 +156,30 @@ def groove(b0, bars, level=1.0, hi=False, kicks=True):
         for s, pi in enumerate(pat):
             add(music, pluck(ch[pi] + 12 + (12 if hi and s % 4 == 3 else 0), .34, 3600 if hi else 2800), t0 + s * .125, .34 * level)
 
-groove(12, 4)
-groove(20, 4, hi=True)
-groove(28, 3, hi=True)
-for tt in (12, 20, 28):
+groove(12, 3)
+groove(18, 3, hi=True)
+groove(24, 2, hi=True)
+for tt in (12, 18, 24):
     add(low, boom(), tt, .55); add(fx, whoosh(.6), tt - .35, .3)
-add(fx, riser(1.0), 19.0, .3); add(fx, riser(1.0), 27.0, .35)
-for tt in (13.22, 19.86, 23.92): add(fx, TK, tt, .5)          # mouse clicks
+add(fx, riser(1.0), 17.0, .3); add(fx, riser(1.0), 23.0, .35)
+for tt in (12.915, 17.895, 20.94): add(fx, TK, tt, .5)          # mouse clicks
 
 # audience 34-38: drums drop out, stab per word, riser into the outro
-add(music, pad((46, 53, 58, 62), 4.0, 1100, .3), 34, .45)
-add(low, boom(), 34, .5)
-for i, tt in enumerate((34.5, 35.5, 36.5)):
+add(music, pad((46, 53, 58, 62), 4.0, 1100, .3), 28, .45)
+add(low, boom(), 28, .5)
+for i, tt in enumerate((28.5, 29.5, 30.5)):
     add(music, stab((58 + 2 * i, 65 + 2 * i, 70 + 2 * i), 3000), tt, .7); add(low, K, tt, .9)
     add(fx, whoosh(.3), tt - .15, .15)
-add(fx, riser(2.0), 36.0, .55)
-for i in range(16): add(drums, C, 37 + i / 16, .1 + .35 * i / 16)
+add(fx, riser(2.0), 30.0, .55)
+for i in range(16): add(drums, C, 31 + i / 16, .1 + .35 * i / 16)
 
-# outro 38-44
-add(low, boom(), 38, 1.0)
-groove(38, 2, level=.9, hi=True)
-add(music, pad((41, 53, 57, 60, 65, 69, 72), 5.5, 2400, .05), 38, .5)
-add(music, pad((41, 53, 60, 65, 69), 2.0, 1800, .05), 42, .5)
-add(low, boom(), 42, .6)
-add(fx, TK, 41.5, .5)
+# outro 32-36
+add(low, boom(), 32, 1.0)
+groove(32, 1, level=.9, hi=True)
+add(music, pad((41, 53, 57, 60, 65, 69, 72), 4.0, 2400, .05), 32, .5)
+add(music, pad((41, 53, 60, 65, 69), 2.0, 1800, .05), 34, .5)
+add(low, boom(), 34, .6)
+add(fx, TK, 34.33, .5)
 
 # ---------- mix ----------
 def reverb(x, secs=1.8, mix=.25):
@@ -194,7 +194,7 @@ def echo(x, d=.375, fb=.35, mix=.3):
     return out
 
 duck = np.ones(N)                                              # sidechain to the kick
-kick_times = [12 + i * BEAT for i in range(44)] + [38 + i * BEAT for i in range(8)]
+kick_times = [12 + i * BEAT for i in range(32)] + [32 + i * BEAT for i in range(4)]
 shape = 1 - .55 * np.exp(-t_(int(.3 * SR)) / .09)
 for kt in kick_times:
     i = int(kt * SR); n = min(len(shape), N - i); duck[i:i + n] = np.minimum(duck[i:i + n], shape[:n])
@@ -209,7 +209,7 @@ side = music * .85 + fx * .8 + drums * .3; k = int(.012 * SR)
 sd = np.concatenate([np.zeros(k), side[:-k]])
 Lc, Rc = mono + .25 * (side - sd), mono - .25 * (side - sd)
 st = np.stack([Lc, Rc], 1)
-fade = np.ones(N); f0 = int(42.6 * SR); fade[f0:] = np.linspace(1, 0, N - f0) ** 1.5
+fade = np.ones(N); f0 = int(35.0 * SR); fade[f0:] = np.linspace(1, 0, N - f0) ** 1.5
 st *= fade[:, None]
 st = np.tanh(st / np.abs(st).max() * 2.2)                      # glue / soft limit
 st = st / np.abs(st).max() * .89

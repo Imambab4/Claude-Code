@@ -437,10 +437,13 @@ tl.to('#s7 .center',{scale:1.03,duration:4,ease:'none'},38.1);
 tl.fromTo('#fade',{opacity:0},{opacity:1,duration:.8,ease:'power1.in'},43.1);
 tl.set({}, {}, DUR);
 
-window.seek = t => { tl.time(clamp(t,0,DUR)); onSeek.forEach(f=>f(t)); };
-window.DUR = DUR;
+/* Output cut is 36s: the product, wall and outro sections play faster than authored. [out, src] knots: */
+const WARP=[[0,0],[12,12],[24,28],[28,34],[32,38],[36,44]], OUT=36;
+const warp = o => { for(let i=1;i<WARP.length;i++){const [o0,s0]=WARP[i-1],[o1,s1]=WARP[i]; if(o<=o1) return s0+(o-o0)/(o1-o0)*(s1-s0);} return DUR; };
+window.seek = o => { const t=warp(clamp(o,0,OUT)); tl.time(t); onSeek.forEach(f=>f(t)); };
+window.DUR = OUT;
 document.fonts.ready.then(()=>{ seek(+new URLSearchParams(location.search).get('t')||0); window.READY=true;
-  if(new URLSearchParams(location.search).has('play')){const s=performance.now();(function f(){const t=(performance.now()-s)/1000%DUR;seek(t);requestAnimationFrame(f)})()} });
+  if(new URLSearchParams(location.search).has('play')){const s=performance.now();(function f(){const t=(performance.now()-s)/1000%OUT;seek(t);requestAnimationFrame(f)})()} });
 </script>
 </body>
 </html>
